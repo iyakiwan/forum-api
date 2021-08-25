@@ -11,18 +11,23 @@ const UserRepositoryPostgres = require('./repository/UserRepositoryPostgres');
 const AuthenticationRepositoryPostgres = require('./repository/AuthenticationRepositoryPostgres');
 const BcryptEncryptionHelper = require('./security/BcryptEncryptionHelper');
 const JwtTokenManager = require('./security/JwtTokenManager');
+const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres');
 
 // use case
+// -- User
 const AddUserUseCase = require('../Applications/use_case/AddUserUseCase');
 const LoginUserUseCase = require('../Applications/use_case/LoginUserUseCase');
 const RefreshAuthenticationUseCase = require('../Applications/use_case/RefreshAuthenticationUseCase');
 const LogoutUserUseCase = require('../Applications/use_case/LogoutUserUseCase');
+// -- Thread
+const AddThreadUseCase = require('../Applications/use_case/threads/AddThreadUseCase');
 
 const serviceInstanceContainer = {
   userRepository: new UserRepositoryPostgres(pool, nanoid),
   authenticationRepository: new AuthenticationRepositoryPostgres(pool),
   encryptionHelper: new BcryptEncryptionHelper(bcrypt),
   authenticationTokenManager: new JwtTokenManager(Jwt.token),
+  threadRepository: new ThreadRepositoryPostgres(pool, nanoid),
 };
 
 const useCaseInstanceContainer = {
@@ -42,6 +47,9 @@ const useCaseInstanceContainer = {
   }),
   logoutUserUseCase: new LogoutUserUseCase({
     authenticationRepository: serviceInstanceContainer.authenticationRepository,
+  }),
+  addThreadUseCase: new AddThreadUseCase({
+    threadRepository: serviceInstanceContainer.threadRepository,
   }),
 };
 

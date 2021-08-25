@@ -1,4 +1,4 @@
-const NewUser = require('../../Domains/users/entities/NewUser');
+const NewUser = require('../../../Domains/users/entities/NewUser');
 
 class AddedUserUseCase {
   constructor({ userRepository, encryptionHelper }) {

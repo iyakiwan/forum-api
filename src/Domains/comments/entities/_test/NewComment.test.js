@@ -37,12 +37,12 @@ describe('a NewComment entities', () => {
 
     // Action
     const {
-      title, body, owner, date,
+      content, threadId, owner, date,
     } = new NewComment(payload);
 
     // Assert
-    expect(title).toEqual(payload.title);
-    expect(body).toEqual(payload.body);
+    expect(content).toEqual(payload.content);
+    expect(threadId).toEqual(payload.threadId);
     expect(owner).toEqual(payload.owner);
     expect(date).toEqual(payload.date);
   });

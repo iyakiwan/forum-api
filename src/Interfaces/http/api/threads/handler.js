@@ -1,5 +1,3 @@
-const NewThread = require('../../../../Domains/threads/entities/NewThread');
-
 class ThreadsHandler {
   constructor({ addThreadUseCase }) {
     this._addThreadUseCase = addThreadUseCase;

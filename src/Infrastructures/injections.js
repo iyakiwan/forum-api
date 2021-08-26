@@ -9,9 +9,10 @@ const pool = require('./database/postgres/pool');
 // service (repository, helper, manager, etc)
 const UserRepositoryPostgres = require('./repository/UserRepositoryPostgres');
 const AuthenticationRepositoryPostgres = require('./repository/AuthenticationRepositoryPostgres');
+const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres');
+const CommentRepositoryPostgres = require('./repository/CommentRepositoryPostgres');
 const BcryptEncryptionHelper = require('./security/BcryptEncryptionHelper');
 const JwtTokenManager = require('./security/JwtTokenManager');
-const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres');
 
 // use case
 // -- User
@@ -21,20 +22,25 @@ const RefreshAuthenticationUseCase = require('../Applications/use_case/authentic
 const LogoutUserUseCase = require('../Applications/use_case/authentications/LogoutUserUseCase');
 // -- Thread
 const AddThreadUseCase = require('../Applications/use_case/threads/AddThreadUseCase');
+// -- Comment
+const AddCommentUseCase = require('../Applications/use_case/comments/AddCommentUseCase');
 
 const serviceInstanceContainer = {
-  userRepository: new UserRepositoryPostgres(pool, nanoid),
-  authenticationRepository: new AuthenticationRepositoryPostgres(pool),
   encryptionHelper: new BcryptEncryptionHelper(bcrypt),
   authenticationTokenManager: new JwtTokenManager(Jwt.token),
+  userRepository: new UserRepositoryPostgres(pool, nanoid),
+  authenticationRepository: new AuthenticationRepositoryPostgres(pool),
   threadRepository: new ThreadRepositoryPostgres(pool, nanoid),
+  commentRepository: new CommentRepositoryPostgres(pool, nanoid),
 };
 
 const useCaseInstanceContainer = {
+  // User
   addUserUseCase: new AddUserUseCase({
     userRepository: serviceInstanceContainer.userRepository,
     encryptionHelper: serviceInstanceContainer.encryptionHelper,
   }),
+  // Auth
   loginUserUseCase: new LoginUserUseCase({
     authenticationRepository: serviceInstanceContainer.authenticationRepository,
     authenticationTokenManager: serviceInstanceContainer.authenticationTokenManager,
@@ -48,7 +54,13 @@ const useCaseInstanceContainer = {
   logoutUserUseCase: new LogoutUserUseCase({
     authenticationRepository: serviceInstanceContainer.authenticationRepository,
   }),
+  // Thread
   addThreadUseCase: new AddThreadUseCase({
+    threadRepository: serviceInstanceContainer.threadRepository,
+  }),
+  // Comment
+  addCommentUseCase: new AddCommentUseCase({
+    commentRepository: serviceInstanceContainer.commentRepository,
     threadRepository: serviceInstanceContainer.threadRepository,
   }),
 };

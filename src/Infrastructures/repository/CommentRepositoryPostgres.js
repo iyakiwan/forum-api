@@ -1,5 +1,6 @@
 const InvariantError = require('../../Commons/exceptions/InvariantError');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
+const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 const AddedComment = require('../../Domains/comments/entities/AddedComment');
 const CommentRepository = require('../../Domains/comments/CommentRepository');
 
@@ -26,37 +27,36 @@ class CommentRepositoryPostgres extends CommentRepository {
     return new AddedComment({ ...result.rows[0] });
   }
 
-  // async verifyAvailableThread(threadId) {
-  //   const query = {
-  //     text: 'SELECT * FROM threads WHERE id = $1',
-  //     values: [threadId],
-  //   };
+  async verifyAvailableComment(comment) {
+    const { commentId, threadId, owner } = comment;
+    const query = {
+      text: 'SELECT * FROM comments WHERE id = $1 AND thread_id = $2',
+      values: [commentId, threadId],
+    };
 
-  //   const result = await this._pool.query(query);
+    const result = await this._pool.query(query);
 
-  //   if (!result.rowCount) {
-  //     throw new NotFoundError('thread tidak ditemukan');
-  //   }
+    if (!result.rowCount) {
+      throw new NotFoundError('Comment tidak ditemukan');
+    }
 
-  //   return result.rows[0];
-  // }
+    if (result.rows[0].owner !== owner) {
+      throw new AuthorizationError('Anda tidak memiliki akses untuk menghapus comment ini');
+    }
 
-  // async getIdByUsername(username) {
-  //   const query = {
-  //     text: 'SELECT id FROM users WHERE username = $1',
-  //     values: [username],
-  //   };
+    if (result.rows[0].is_delete === true) {
+      throw new InvariantError('Comment telah dihapus');
+    }
+  }
 
-  //   const result = await this._pool.query(query);
+  async deleteComment(commentId) {
+    const query = {
+      text: 'UPDATE comments SET is_delete = true WHERE id = $1',
+      values: [commentId],
+    };
 
-  //   if (!result.rowCount) {
-  //     throw new InvariantError('user tidak ditemukan');
-  //   }
-
-  //   const { id } = result.rows[0];
-
-  //   return id;
-  // }
+    const result = await this._pool.query(query);
+  }
 }
 
 module.exports = CommentRepositoryPostgres;

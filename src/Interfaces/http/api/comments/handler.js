@@ -1,8 +1,10 @@
 class CommentsHandler {
-  constructor({ addCommentUseCase }) {
+  constructor({ addCommentUseCase, deleteCommentUseCase }) {
     this._addCommentUseCase = addCommentUseCase;
+    this._deleteCommentUseCase = deleteCommentUseCase;
 
     this.postCommentHandler = this.postCommentHandler.bind(this);
+    this.deleteCommentHandler = this.deleteCommentHandler.bind(this);
   }
 
   async postCommentHandler(request, h) {
@@ -24,6 +26,24 @@ class CommentsHandler {
       },
     });
     response.code(201);
+    return response;
+  }
+
+  async deleteCommentHandler(request, h) {
+    const { id: owner } = request.auth.credentials;
+    const { threadId, commentId } = request.params;
+
+    const deleteComment = {
+      commentId, threadId, owner,
+    };
+
+    await this._deleteCommentUseCase.execute(deleteComment);
+
+    const response = h.response({
+      status: 'success',
+    });
+
+    response.code(200);
     return response;
   }
 }

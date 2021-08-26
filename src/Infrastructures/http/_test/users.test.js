@@ -149,7 +149,7 @@ describe('/users endpoint', () => {
       const responseJson = JSON.parse(response.payload);
       expect(response.statusCode).toEqual(400);
       expect(responseJson.status).toEqual('fail');
-      expect(responseJson.message).toEqual('username tidak tersedia');
+      expect(responseJson.message).toEqual('Username telah dibuat');
     });
   });
 });

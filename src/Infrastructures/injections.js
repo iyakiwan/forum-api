@@ -24,6 +24,7 @@ const LogoutUserUseCase = require('../Applications/use_case/authentications/Logo
 const AddThreadUseCase = require('../Applications/use_case/threads/AddThreadUseCase');
 // -- Comment
 const AddCommentUseCase = require('../Applications/use_case/comments/AddCommentUseCase');
+const DeleteCommentUseCase = require('../Applications/use_case/comments/DeleteCommentUseCase');
 
 const serviceInstanceContainer = {
   encryptionHelper: new BcryptEncryptionHelper(bcrypt),
@@ -62,6 +63,9 @@ const useCaseInstanceContainer = {
   addCommentUseCase: new AddCommentUseCase({
     commentRepository: serviceInstanceContainer.commentRepository,
     threadRepository: serviceInstanceContainer.threadRepository,
+  }),
+  deleteCommentUseCase: new DeleteCommentUseCase({
+    commentRepository: serviceInstanceContainer.commentRepository,
   }),
 };
 

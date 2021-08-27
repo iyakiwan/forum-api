@@ -137,5 +137,45 @@ describe('CommentRepositoryPostgres', () => {
         expect(findComments[0].is_delete).toEqual(true);
       });
     });
+
+    describe('verifyComment function', () => {
+      const commentParam = {
+        commentId: 'comment-123', threadId: 'thread-123',
+      };
+      it('should throw NotFoundError when not commentid and threadId available', async () => {
+        // Arrange
+        const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+        // Action & Assert
+        await expect(commentRepositoryPostgres.verifyComment(commentParam))
+          .rejects.toThrowError(NotFoundError);
+      });
+
+      it('should throw InvariantError when comment is deleted', async () => {
+        // Arrange
+        await UsersTableTestHelper.addUser({ id: 'user-123' });
+        await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+        await CommentsTableTestHelper.addComment({ id: 'comment-123', isDelete: true });
+
+        const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+        // Action & Assert
+        await expect(commentRepositoryPostgres.verifyComment(commentParam))
+          .rejects.toThrowError(InvariantError);
+      });
+
+      it('should not throw NotFoundError when id available', async () => {
+        // Arrange
+        await UsersTableTestHelper.addUser({ id: 'user-123' });
+        await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+        await CommentsTableTestHelper.addComment({ id: 'comment-123' });
+
+        const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+        // Action & Assert
+        await expect(commentRepositoryPostgres.verifyComment(commentParam))
+          .resolves.not.toThrowError(InvariantError);
+      });
+    });
   });
 });

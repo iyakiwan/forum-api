@@ -2,6 +2,7 @@ const InvariantError = require('../../Commons/exceptions/InvariantError');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 const AddedReply = require('../../Domains/replies/entities/AddedReply');
+const DetailReply = require('../../Domains/replies/entities/DetailReply');
 const ReplyRepository = require('../../Domains/replies/ReplyRepository');
 
 class ReplyRepositoryPostgres extends ReplyRepository {
@@ -56,6 +57,21 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     };
 
     await this._pool.query(query);
+  }
+
+  async getReplyByCommentId(commentId) {
+    const query = {
+      text: `SELECT replies.id , users.username, replies.date, replies.content, replies.is_delete AS "isDelete"
+      FROM replies 
+      INNER JOIN users ON replies.owner = users.id 
+      WHERE replies.comment_id = $1`,
+      values: [commentId],
+    };
+
+    const result = await this._pool.query(query);
+    const replies = result.rows.map((reply) => new DetailReply(reply));
+
+    return replies;
   }
 }
 

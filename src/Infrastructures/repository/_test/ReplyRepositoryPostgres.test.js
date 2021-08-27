@@ -144,5 +144,32 @@ describe('ReplyRepositoryPostgres', () => {
         expect(findReplies[0].is_delete).toEqual(true);
       });
     });
+
+    describe('getReplyByCommentId function', () => {
+      it('should persist get Reply when commentId correctly', async () => {
+        const replyParam = {
+          replyId: 'reply-123', commentId: 'comment-123', threadId: 'thread-123', owner: 'user-123',
+        };
+
+        // Arrange
+        await UsersTableTestHelper.addUser({ id: 'user-123' });
+        await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+        await CommentsTableTestHelper.addComment({ id: 'comment-123' });
+        await RepliesTableTestHelper.addReply({ id: 'reply-123', isDelete: true });
+        await RepliesTableTestHelper.addReply({ id: 'reply-124' });
+
+        const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+        // Action
+
+        const replies = await replyRepositoryPostgres.getReplyByCommentId('comment-123');
+
+        // Assert
+        expect(replies[0]).toHaveProperty('id');
+        expect(replies[0]).toHaveProperty('content');
+        expect(replies[0]).toHaveProperty('date');
+        expect(replies[0]).toHaveProperty('username');
+      });
+    });
   });
 });

@@ -15,9 +15,9 @@ class CommentRepository {
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 
-  // async getIdByUsername(username) {
-  //   throw new Error('USER_REPOSITORY.METHOD_NOT_IMPLEMENTED');
-  // }
+  async getCommentsByThreadId(threadId) {
+    throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+  }
 }
 
 module.exports = CommentRepository;

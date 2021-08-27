@@ -1,6 +1,6 @@
-const DetailReply = require('../DetailReply');
+const DetailComment = require('../DetailComment');
 
-describe('a DetailReply entities', () => {
+describe('a DetailComment entities', () => {
   it('should throw error when payload did not contain needed property', () => {
     // Arrange
     const payload = {
@@ -11,7 +11,7 @@ describe('a DetailReply entities', () => {
     };
 
     // Action and Assert
-    expect(() => new DetailReply(payload)).toThrowError('DETAIL_REPLY.NOT_CONTAIN_NEEDED_PROPERTY');
+    expect(() => new DetailComment(payload)).toThrowError('DETAIL_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 
   it('should throw error when payload did not meet data type specification', () => {
@@ -22,13 +22,14 @@ describe('a DetailReply entities', () => {
       date: '2021-08-27',
       username: 'Mufti',
       isDelete: 'tidak',
+      replies: {},
     };
 
     // Action and Assert
-    expect(() => new DetailReply(payload)).toThrowError('DETAIL_REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    expect(() => new DetailComment(payload)).toThrowError('DETAIL_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
-  it('should create DetailReply object correctly', () => {
+  it('should create DetailComment object correctly', () => {
     // Arrange
     const payload = {
       id: 'reply-123',
@@ -36,17 +37,19 @@ describe('a DetailReply entities', () => {
       date: '2021-08-27',
       username: 'Mufti',
       isDelete: true,
+      replies: [],
     };
 
     // Action
     const {
-      id, content, date, username,
-    } = new DetailReply(payload);
+      id, content, date, username, replies,
+    } = new DetailComment(payload);
 
     // Assert
     expect(id).toEqual(payload.id);
-    expect(content).toEqual(DetailReply.DELETED_CONTENT_REPLY);
+    expect(content).toEqual(DetailComment.DELETED_CONTENT_COMMENT);
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
+    expect(replies).toEqual(payload.replies);
   });
 });

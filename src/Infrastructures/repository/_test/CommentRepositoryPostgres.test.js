@@ -176,5 +176,27 @@ describe('CommentRepositoryPostgres', () => {
           .resolves.not.toThrowError(InvariantError);
       });
     });
+
+    describe('getCommentsByThreadId function', () => {
+      it('should persist get Comment when threadId correctly', async () => {
+        // Arrange
+        await UsersTableTestHelper.addUser({ id: 'user-123' });
+        await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+        await CommentsTableTestHelper.addComment({ id: 'comment-123', isDelete: true });
+        await CommentsTableTestHelper.addComment({ id: 'comment-124' });
+
+        const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+        // Action
+        const comments = await commentRepositoryPostgres.getCommentsByThreadId('thread-123');
+
+        // Assert
+        expect(comments[0]).toHaveProperty('id');
+        expect(comments[0]).toHaveProperty('content');
+        expect(comments[0]).toHaveProperty('date');
+        expect(comments[0]).toHaveProperty('username');
+        expect(comments[0]).toHaveProperty('replies');
+      });
+    });
   });
 });

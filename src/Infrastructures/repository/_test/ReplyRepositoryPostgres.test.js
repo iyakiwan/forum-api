@@ -147,10 +147,6 @@ describe('ReplyRepositoryPostgres', () => {
 
     describe('getReplyByCommentId function', () => {
       it('should persist get Reply when commentId correctly', async () => {
-        const replyParam = {
-          replyId: 'reply-123', commentId: 'comment-123', threadId: 'thread-123', owner: 'user-123',
-        };
-
         // Arrange
         await UsersTableTestHelper.addUser({ id: 'user-123' });
         await ThreadsTableTestHelper.addThread({ id: 'thread-123' });

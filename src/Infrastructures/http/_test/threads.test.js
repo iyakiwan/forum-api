@@ -8,6 +8,7 @@ const createServer = require('../createServer');
 
 describe('/threads endpoint', () => {
   let tokenAuth;
+
   afterAll(async () => {
     await pool.end();
   });

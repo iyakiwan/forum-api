@@ -7,10 +7,11 @@ const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelp
 const injections = require('../../injections');
 const createServer = require('../createServer');
 
-describe('/comments endpoint', () => {
+describe('/threads/{threadId} endpoint', () => {
   let tokenAuth;
   let threadId;
   let commentId;
+
   afterAll(async () => {
     await pool.end();
   });

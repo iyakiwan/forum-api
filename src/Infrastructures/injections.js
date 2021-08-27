@@ -11,6 +11,7 @@ const UserRepositoryPostgres = require('./repository/UserRepositoryPostgres');
 const AuthenticationRepositoryPostgres = require('./repository/AuthenticationRepositoryPostgres');
 const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres');
 const CommentRepositoryPostgres = require('./repository/CommentRepositoryPostgres');
+const ReplyRepositoryPostgres = require('./repository/ReplyRepositoryPostgres');
 const BcryptEncryptionHelper = require('./security/BcryptEncryptionHelper');
 const JwtTokenManager = require('./security/JwtTokenManager');
 
@@ -25,6 +26,8 @@ const AddThreadUseCase = require('../Applications/use_case/threads/AddThreadUseC
 // -- Comment
 const AddCommentUseCase = require('../Applications/use_case/comments/AddCommentUseCase');
 const DeleteCommentUseCase = require('../Applications/use_case/comments/DeleteCommentUseCase');
+// -- Reply
+const AddReplyUseCase = require('../Applications/use_case/replies/AddReplyUseCase');
 
 const serviceInstanceContainer = {
   encryptionHelper: new BcryptEncryptionHelper(bcrypt),
@@ -33,6 +36,7 @@ const serviceInstanceContainer = {
   authenticationRepository: new AuthenticationRepositoryPostgres(pool),
   threadRepository: new ThreadRepositoryPostgres(pool, nanoid),
   commentRepository: new CommentRepositoryPostgres(pool, nanoid),
+  replyRepository: new ReplyRepositoryPostgres(pool, nanoid),
 };
 
 const useCaseInstanceContainer = {
@@ -65,6 +69,11 @@ const useCaseInstanceContainer = {
     threadRepository: serviceInstanceContainer.threadRepository,
   }),
   deleteCommentUseCase: new DeleteCommentUseCase({
+    commentRepository: serviceInstanceContainer.commentRepository,
+  }),
+  // Reply
+  addReplyUseCase: new AddReplyUseCase({
+    replyRepository: serviceInstanceContainer.replyRepository,
     commentRepository: serviceInstanceContainer.commentRepository,
   }),
 };

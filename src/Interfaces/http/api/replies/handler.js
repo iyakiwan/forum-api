@@ -1,10 +1,10 @@
 class RepliesHandler {
-  constructor({ addReplyUseCase }) {
+  constructor({ addReplyUseCase, deleteReplyUseCase }) {
     this._addReplyUseCase = addReplyUseCase;
-    // this._deleteCommentUseCase = deleteCommentUseCase;
+    this._deleteReplyUseCase = deleteReplyUseCase;
 
     this.postReplyHandler = this.postReplyHandler.bind(this);
-    // this.deleteCommentHandler = this.deleteCommentHandler.bind(this);
+    this.deleteReplyHandler = this.deleteReplyHandler.bind(this);
   }
 
   async postReplyHandler(request, h) {
@@ -29,23 +29,23 @@ class RepliesHandler {
     return response;
   }
 
-  // async deleteCommentHandler(request, h) {
-  //   const { id: owner } = request.auth.credentials;
-  //   const { threadId, commentId } = request.params;
+  async deleteReplyHandler(request, h) {
+    const { id: owner } = request.auth.credentials;
+    const { threadId, commentId, replyId } = request.params;
 
-  //   const deleteComment = {
-  //     commentId, threadId, owner,
-  //   };
+    const deleteReply = {
+      replyId, commentId, threadId, owner,
+    };
 
-  //   await this._deleteCommentUseCase.execute(deleteComment);
+    await this._deleteReplyUseCase.execute(deleteReply);
 
-  //   const response = h.response({
-  //     status: 'success',
-  //   });
+    const response = h.response({
+      status: 'success',
+    });
 
-  //   response.code(200);
-  //   return response;
-  // }
+    response.code(200);
+    return response;
+  }
 }
 
 module.exports = RepliesHandler;

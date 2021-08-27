@@ -75,6 +75,16 @@ describe('/threads/{threadId}/comments/{commentId} endpoint', () => {
 
     const responseJsonComment = JSON.parse(responseComment.payload);
     commentId = responseJsonComment.data.addedComment.id;
+
+    const responseReply = await server.inject({
+      method: 'POST',
+      url: `/threads/${threadId}/comments/${commentId}/replies`,
+      payload: { content: 'sebuah Reply' },
+      headers: { Authorization: `Bearer ${tokenAuth}` },
+    });
+
+    const responseJsonReply = JSON.parse(responseReply.payload);
+    replyId = responseJsonReply.data.addedReply.id;
   });
 
   describe('when POST /threads/{threadId}/comments/{commentId}/replies', () => {
@@ -210,116 +220,114 @@ describe('/threads/{threadId}/comments/{commentId} endpoint', () => {
     });
   });
 
-  // describe('when DELETE /threads/{threadId}/comments/{commentId}', () => {
-  //   it('should response 200 and deleted comments', async () => {
-  //     const server = await createServer(injections);
+  describe('when DELETE /threads/{threadId}/comments/{commentId}/replies/{replyId}', () => {
+    it('should response 200 and deleted comments', async () => {
+      const server = await createServer(injections);
 
-  //     // Action
-  //     const response = await server.inject({
-  //       method: 'DELETE',
-  //       url: `/threads/${threadId}/comments/${commentId}`,
-  //       headers: { Authorization: `Bearer ${tokenAuth}` },
-  //     });
+      // Action
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}/comments/${commentId}/replies/${replyId}`,
+        headers: { Authorization: `Bearer ${tokenAuth}` },
+      });
 
-  //     // Assert
-  //     const responseJson = JSON.parse(response.payload);
-  //     expect(response.statusCode).toEqual(200);
-  //     expect(responseJson.status).toEqual('success');
-  //   });
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
+    });
 
-  //   it('should response 400 when comment already deleted', async () => {
-  //     const server = await createServer(injections);
-  //     await server.inject({
-  //       method: 'DELETE',
-  //       url: `/threads/${threadId}/comments/${commentId}`,
-  //       headers: { Authorization: `Bearer ${tokenAuth}` },
-  //     });
+    it('should response 400 when reply already deleted', async () => {
+      const server = await createServer(injections);
+      await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}/comments/${commentId}/replies/${replyId}`,
+        headers: { Authorization: `Bearer ${tokenAuth}` },
+      });
 
-  //     // Action
-  //     const response = await server.inject({
-  //       method: 'DELETE',
-  //       url: `/threads/${threadId}/comments/${commentId}`,
-  //       headers: { Authorization: `Bearer ${tokenAuth}` },
-  //     });
+      // Action
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}/comments/${commentId}/replies/${replyId}`,
+        headers: { Authorization: `Bearer ${tokenAuth}` },
+      });
 
-  //     // Assert
-  //     const responseJson = JSON.parse(response.payload);
-  //     expect(response.statusCode).toEqual(400);
-  //     expect(responseJson.message).toEqual('Comment telah dihapus');
-  //   });
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(400);
+      expect(responseJson.message).toEqual('reply telah dihapus');
+    });
 
-  //   it('should response 401 when request without Authorization', async () => {
-  //     const server = await createServer(injections);
+    it('should response 401 when request without Authorization', async () => {
+      const server = await createServer(injections);
 
-  //     // Action
-  //     // Action
-  //     const response = await server.inject({
-  //       method: 'DELETE',
-  //       url: `/threads/${threadId}/comments/${commentId}`,
-  //     });
+      // Action
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}/comments/${commentId}/replies/${replyId}`,
+      });
 
-  //     // Assert
-  //     const responseJson = JSON.parse(response.payload);
-  //     expect(response.statusCode).toEqual(401);
-  //     expect(responseJson.error).toEqual('Unauthorized');
-  //     expect(responseJson.message).toEqual('Missing authentication');
-  //   });
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(401);
+      expect(responseJson.error).toEqual('Unauthorized');
+      expect(responseJson.message).toEqual('Missing authentication');
+    });
 
-  //   it('should response 403 when owner is not Authorization', async () => {
-  //     const server = await createServer(injections);
-  //     // create other user
-  //     await server.inject({
-  //       method: 'POST',
-  //       url: '/users',
-  //       payload: {
-  //         username: 'muftialies',
-  //         password: 'secret',
-  //         fullname: 'Dicoding Indonesia',
-  //       },
-  //     });
-  //     // login user
-  //     const responseAuth = await server.inject({
-  //       method: 'POST',
-  //       url: '/authentications',
-  //       payload: {
-  //         username: 'muftialies',
-  //         password: 'secret',
-  //       },
-  //     });
+    it('should response 403 when owner is not Authorization', async () => {
+      const server = await createServer(injections);
+      // create other user
+      await server.inject({
+        method: 'POST',
+        url: '/users',
+        payload: {
+          username: 'muftialies',
+          password: 'secret',
+          fullname: 'Dicoding Indonesia',
+        },
+      });
+      // login user
+      const responseAuth = await server.inject({
+        method: 'POST',
+        url: '/authentications',
+        payload: {
+          username: 'muftialies',
+          password: 'secret',
+        },
+      });
 
-  //     const responseJsonAuthNew = JSON.parse(responseAuth.payload);
-  //     const newtokenAuth = responseJsonAuthNew.data.accessToken;
+      const responseJsonAuthNew = JSON.parse(responseAuth.payload);
+      const newtokenAuth = responseJsonAuthNew.data.accessToken;
 
-  //     // Action
-  //     const response = await server.inject({
-  //       method: 'DELETE',
-  //       url: `/threads/${threadId}/comments/${commentId}`,
-  //       headers: { Authorization: `Bearer ${newtokenAuth}` },
-  //     });
+      // Action
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}/comments/${commentId}/replies/${replyId}`,
+        headers: { Authorization: `Bearer ${newtokenAuth}` },
+      });
 
-  //     // Assert
-  //     const responseJson = JSON.parse(response.payload);
-  //     expect(response.statusCode).toEqual(403);
-  //     expect(responseJson.status).toEqual('fail');
-  //     expect(responseJson.message).toEqual('Anda tidak
-  // memiliki akses untuk menghapus comment ini');
-  //   });
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(403);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('Anda tidak memiliki akses untuk menghapus reply ini');
+    });
 
-  //   it('should response 404 when threadId and commentId not found', async () => {
-  //     const server = await createServer(injections);
+    it('should response 404 when threadId and commentId not found', async () => {
+      const server = await createServer(injections);
 
-  //     // Action
-  //     const response = await server.inject({
-  //       method: 'DELETE',
-  //       url: '/threads/xxx/comments/xxx',
-  //       headers: { Authorization: `Bearer ${tokenAuth}` },
-  //     });
+      // Action
+      const response = await server.inject({
+        method: 'DELETE',
+        url: '/threads/xxx/comments/xxx/replies/xxx',
+        headers: { Authorization: `Bearer ${tokenAuth}` },
+      });
 
-  //     // Assert
-  //     const responseJson = JSON.parse(response.payload);
-  //     expect(response.statusCode).toEqual(404);
-  //     expect(responseJson.status).toEqual('fail');
-  //     expect(responseJson.message).toEqual('Comment tidak ditemukan');
-  //   });
-  // });
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('reply tidak ditemukan');
+    });
+  });
 });

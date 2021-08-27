@@ -27,36 +27,36 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     return new AddedReply({ ...result.rows[0] });
   }
 
-  // async verifyAvailableReply(reply) {
-  //   const { commentId, threadId, owner } = reply;
-  //   const query = {
-  //     text: 'SELECT * FROM comments WHERE id = $1 AND thread_id = $2',
-  //     values: [commentId, threadId],
-  //   };
+  async verifyAvailableReply(reply) {
+    const { replyId, commentId, owner } = reply;
+    const query = {
+      text: 'SELECT * FROM replies WHERE id = $1 AND comment_id = $2',
+      values: [replyId, commentId],
+    };
 
-  //   const result = await this._pool.query(query);
+    const result = await this._pool.query(query);
 
-  //   if (!result.rowCount) {
-  //     throw new NotFoundError('reply tidak ditemukan');
-  //   }
+    if (!result.rowCount) {
+      throw new NotFoundError('reply tidak ditemukan');
+    }
 
-  //   if (result.rows[0].owner !== owner) {
-  //     throw new AuthorizationError('Anda tidak memiliki akses untuk menghapus reply ini');
-  //   }
+    if (result.rows[0].owner !== owner) {
+      throw new AuthorizationError('Anda tidak memiliki akses untuk menghapus reply ini');
+    }
 
-  //   if (result.rows[0].is_delete === true) {
-  //     throw new InvariantError('reply telah dihapus');
-  //   }
-  // }
+    if (result.rows[0].is_delete === true) {
+      throw new InvariantError('reply telah dihapus');
+    }
+  }
 
-  // async deleteReply(replyId) {
-  //   const query = {
-  //     text: 'UPDATE comments SET is_delete = true WHERE id = $1',
-  //     values: [replyId],
-  //   };
+  async deleteReply(replyId) {
+    const query = {
+      text: 'UPDATE replies SET is_delete = true WHERE id = $1',
+      values: [replyId],
+    };
 
-  //   await this._pool.query(query);
-  // }
+    await this._pool.query(query);
+  }
 }
 
 module.exports = ReplyRepositoryPostgres;

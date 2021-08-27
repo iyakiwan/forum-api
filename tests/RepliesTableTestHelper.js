@@ -7,7 +7,7 @@ const RepliesTableTestHelper = {
     commentId = 'comment-123', owner = 'user-123', isDelete = false,
   }) {
     const query = {
-      text: 'INSERT INTO replies VALUES($1, $2, $3, $4, $5)',
+      text: 'INSERT INTO replies VALUES($1, $2, $3, $4, $5, $6)',
       values: [id, content, date, commentId, owner, isDelete],
     };
 

@@ -33,7 +33,6 @@ describe('CommentRepositoryPostgres', () => {
         // Arrange
         await UsersTableTestHelper.addUser({ id: 'user-123' });
         await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
-        await ThreadsTableTestHelper.findThreadsById('thread-123');
         const newComment = new NewComment({
           content: 'sebuah comment',
           threadId: 'thread-123',

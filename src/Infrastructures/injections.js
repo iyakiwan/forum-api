@@ -28,6 +28,7 @@ const AddCommentUseCase = require('../Applications/use_case/comments/AddCommentU
 const DeleteCommentUseCase = require('../Applications/use_case/comments/DeleteCommentUseCase');
 // -- Reply
 const AddReplyUseCase = require('../Applications/use_case/replies/AddReplyUseCase');
+const DeleteReplyUseCase = require('../Applications/use_case/replies/DeleteReplyUseCase');
 
 const serviceInstanceContainer = {
   encryptionHelper: new BcryptEncryptionHelper(bcrypt),
@@ -75,6 +76,9 @@ const useCaseInstanceContainer = {
   addReplyUseCase: new AddReplyUseCase({
     replyRepository: serviceInstanceContainer.replyRepository,
     commentRepository: serviceInstanceContainer.commentRepository,
+  }),
+  deleteReplyUseCase: new DeleteReplyUseCase({
+    replyRepository: serviceInstanceContainer.replyRepository,
   }),
 };
 

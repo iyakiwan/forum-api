@@ -3,17 +3,24 @@ const pool = require('../../database/postgres/pool');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const AuthenticationsTableTestHelper = require('../../../../tests/AuthenticationsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
+const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
+const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 const injections = require('../../injections');
 const createServer = require('../createServer');
 
 describe('/threads endpoint', () => {
   let tokenAuth;
+  let threadId;
+  let commentId;
+  let replyId;
 
   afterAll(async () => {
     await pool.end();
   });
 
   afterEach(async () => {
+    await RepliesTableTestHelper.cleanTable();
+    await CommentsTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
     await AuthenticationsTableTestHelper.cleanTable();
     await UsersTableTestHelper.cleanTable();
@@ -45,6 +52,39 @@ describe('/threads endpoint', () => {
 
     const responseJsonAuth = JSON.parse(responseAuth.payload);
     tokenAuth = responseJsonAuth.data.accessToken;
+
+    const responseThread = await server.inject({
+      method: 'POST',
+      url: '/threads',
+      payload: {
+        title: 'sebuah thread',
+        body: 'sebuah body thread',
+      },
+      headers: { Authorization: `Bearer ${tokenAuth}` },
+    });
+
+    const responseJsonThread = JSON.parse(responseThread.payload);
+    threadId = responseJsonThread.data.addedThread.id;
+
+    const responseComment = await server.inject({
+      method: 'POST',
+      url: `/threads/${threadId}/comments`,
+      payload: { content: 'sebuah comment' },
+      headers: { Authorization: `Bearer ${tokenAuth}` },
+    });
+
+    const responseJsonComment = JSON.parse(responseComment.payload);
+    commentId = responseJsonComment.data.addedComment.id;
+
+    const responseReply = await server.inject({
+      method: 'POST',
+      url: `/threads/${threadId}/comments/${commentId}/replies`,
+      payload: { content: 'sebuah Reply' },
+      headers: { Authorization: `Bearer ${tokenAuth}` },
+    });
+
+    const responseJsonReply = JSON.parse(responseReply.payload);
+    replyId = responseJsonReply.data.addedReply.id;
   });
 
   describe('when POST /threads', () => {
@@ -54,7 +94,7 @@ describe('/threads endpoint', () => {
         title: 'sebuah thread',
         body: 'sebuah body thread',
       };
-      // eslint-disable-next-line no-undef
+
       const server = await createServer(injections);
 
       // Action
@@ -136,6 +176,42 @@ describe('/threads endpoint', () => {
       expect(response.statusCode).toEqual(401);
       expect(responseJson.error).toEqual('Unauthorized');
       expect(responseJson.message).toEqual('Missing authentication');
+    });
+  });
+
+  describe('when GET /threads/{threadId}', () => {
+    it('should response 200 and get detail thread', async () => {
+      const server = await createServer(injections);
+
+      // Action
+      const response = await server.inject({
+        method: 'GET',
+        url: `/threads/${threadId}`,
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
+      expect(responseJson.data.thread).toBeDefined();
+      expect(responseJson.data.thread.comments).toBeDefined();
+      expect(responseJson.data.thread.comments[0].replies[0]).toBeDefined();
+    });
+
+    it('should response 404 when threadId not found', async () => {
+      const server = await createServer(injections);
+
+      // Action
+      const response = await server.inject({
+        method: 'GET',
+        url: '/threads/xxx',
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('thread tidak ditemukan');
     });
   });
 });

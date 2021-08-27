@@ -82,7 +82,8 @@ class CommentRepositoryPostgres extends CommentRepository {
       text: `SELECT comments.id, users.username, comments.date, comments.content, comments.is_delete AS "isDelete"
       FROM comments 
       INNER JOIN users ON comments.owner = users.id 
-      WHERE comments.thread_id = $1`,
+      WHERE comments.thread_id = $1
+      ORDER BY comments.date ASC`,
       values: [threadId],
     };
 

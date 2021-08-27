@@ -23,6 +23,7 @@ const RefreshAuthenticationUseCase = require('../Applications/use_case/authentic
 const LogoutUserUseCase = require('../Applications/use_case/authentications/LogoutUserUseCase');
 // -- Thread
 const AddThreadUseCase = require('../Applications/use_case/threads/AddThreadUseCase');
+const GetThreadUseCase = require('../Applications/use_case/threads/GetThreadUseCase');
 // -- Comment
 const AddCommentUseCase = require('../Applications/use_case/comments/AddCommentUseCase');
 const DeleteCommentUseCase = require('../Applications/use_case/comments/DeleteCommentUseCase');
@@ -63,6 +64,11 @@ const useCaseInstanceContainer = {
   // Thread
   addThreadUseCase: new AddThreadUseCase({
     threadRepository: serviceInstanceContainer.threadRepository,
+  }),
+  getThreadUseCase: new GetThreadUseCase({
+    threadRepository: serviceInstanceContainer.threadRepository,
+    commentRepository: serviceInstanceContainer.commentRepository,
+    replyRepository: serviceInstanceContainer.replyRepository,
   }),
   // Comment
   addCommentUseCase: new AddCommentUseCase({

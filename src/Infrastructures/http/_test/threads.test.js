@@ -85,6 +85,12 @@ describe('/threads endpoint', () => {
 
     const responseJsonReply = JSON.parse(responseReply.payload);
     replyId = responseJsonReply.data.addedReply.id;
+
+    await server.inject({
+      method: 'PUT',
+      url: `/threads/${threadId}/comments/${commentId}/likes`,
+      headers: { Authorization: `Bearer ${tokenAuth}` },
+    });
   });
 
   describe('when POST /threads', () => {
@@ -196,6 +202,7 @@ describe('/threads endpoint', () => {
       expect(responseJson.data.thread).toBeDefined();
       expect(responseJson.data.thread.comments).toBeDefined();
       expect(responseJson.data.thread.comments[0].replies[0]).toBeDefined();
+      expect(responseJson.data.thread.comments[0].likeCount).toBeDefined();
     });
 
     it('should response 404 when threadId not found', async () => {

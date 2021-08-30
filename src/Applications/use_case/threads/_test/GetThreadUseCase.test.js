@@ -13,6 +13,7 @@ describe('GetThreadUseCase', () => {
   it('should orchestrating the get thread action correctly', async () => {
     // Arrange
     const threadId = 'thread-123';
+    const expectedLikeCount = 1;
 
     const expectedReply = [{
       id: 'reply-123',
@@ -27,6 +28,7 @@ describe('GetThreadUseCase', () => {
       date: '2021-08-26',
       content: 'sebuah comment',
       replies: [{ ...expectedReply[0] }],
+      likeCount: expectedLikeCount,
     }];
 
     const expectedThread = new DetailThread({
@@ -47,6 +49,8 @@ describe('GetThreadUseCase', () => {
     mockReplyRepository.getReplyByCommentId = jest.fn(() => Promise.resolve(expectedReply));
     mockCommentRepository.getCommentsByThreadId = jest.fn(() => Promise.resolve(expectedComment));
     mockThreadRepository.getThreadById = jest.fn(() => Promise.resolve(expectedThread));
+    mockCommentRepository.getCountLikesbyCommentId = jest
+      .fn(() => Promise.resolve(expectedLikeCount));
 
     /** creating use case instance */
     const getThreadUseCase = new GetThreadUseCase({

@@ -289,5 +289,25 @@ describe('CommentRepositoryPostgres', () => {
         expect(likes).toHaveLength(0);
       });
     });
+
+    describe('getCountLikesbyCommentId function', () => {
+      it('should persist get likes on comment', async () => {
+        // Arrange
+        await UsersTableTestHelper.addUser({ id: 'user-123' });
+        await UsersTableTestHelper.addUser({ id: 'user-124', username: 'dicoding-2' });
+        await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+        await CommentsTableTestHelper.addComment({ id: 'comment-123' });
+        await LikesTableTestHelper.addLikes({ id: 'like-123', userId: 'user-123' });
+        await LikesTableTestHelper.addLikes({ id: 'like-124', userId: 'user-124' });
+
+        const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+        // Action
+        const count = await commentRepositoryPostgres.getCountLikesbyCommentId('comment-123');
+
+        // Assert
+        expect(count).toEqual(2);
+      });
+    });
   });
 });

@@ -12,7 +12,6 @@ describe('/threads/{threadId} endpoint', () => {
   let tokenAuth;
   let threadId;
   let commentId;
-  let likeId;
 
   afterAll(async () => {
     await pool.end();

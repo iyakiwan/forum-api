@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
 const DetailThread = require('../../../Domains/threads/entities/DetailThread');
 
 class GetThreadUseCase {
@@ -12,12 +14,11 @@ class GetThreadUseCase {
     const comments = await this._commentRepository.getCommentsByThreadId(threadId);
     const result = [];
 
-    // eslint-disable-next-line no-restricted-syntax
     for (const comment of comments) {
       result.push({
         ...comment,
-        // eslint-disable-next-line no-await-in-loop
         replies: await this._replyRepository.getReplyByCommentId(comment.id),
+        likeCount: await this._commentRepository.getCountLikesbyCommentId(comment.id),
       });
     }
 

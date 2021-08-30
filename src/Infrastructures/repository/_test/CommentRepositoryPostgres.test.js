@@ -1,3 +1,4 @@
+const LikesTableTestHelper = require('../../../../tests/LikesTableTestHelper');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
@@ -19,6 +20,7 @@ describe('CommentRepositoryPostgres', () => {
 
   describe('behavior test', () => {
     afterEach(async () => {
+      await LikesTableTestHelper.cleanTable();
       await CommentsTableTestHelper.cleanTable();
       await ThreadsTableTestHelper.cleanTable();
       await UsersTableTestHelper.cleanTable();
@@ -29,7 +31,7 @@ describe('CommentRepositoryPostgres', () => {
     });
 
     describe('addComment function', () => {
-      it('should persist new thread and return added thread correctly', async () => {
+      it('should persist new comment and return added comment correctly', async () => {
         // Arrange
         await UsersTableTestHelper.addUser({ id: 'user-123' });
         await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
@@ -196,6 +198,95 @@ describe('CommentRepositoryPostgres', () => {
         expect(comments[0]).toHaveProperty('date');
         expect(comments[0]).toHaveProperty('username');
         expect(comments[0]).toHaveProperty('replies');
+      });
+    });
+
+    describe('verifyLikeInComment function', () => {
+      const commentParam = {
+        commentId: 'comment-123', userId: 'user-123',
+      };
+      it('should false when commentId and userId is not Liked', async () => {
+        // Arrange
+        await UsersTableTestHelper.addUser({ id: 'user-123' });
+        await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+        await CommentsTableTestHelper.addComment({ id: 'comment-123' });
+
+        const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+        // Action
+        const verify = await commentRepositoryPostgres.verifyLikeInComment(commentParam);
+
+        // Assert
+        const likes = await LikesTableTestHelper.findCommentsByCommentidAndUserId(commentParam);
+        expect(verify).toEqual(false);
+        expect(likes).toHaveLength(0);
+      });
+
+      it('should true when commentId and userId is Liked', async () => {
+        // Arrange
+        await UsersTableTestHelper.addUser({ id: 'user-123' });
+        await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+        await CommentsTableTestHelper.addComment({ id: 'comment-123' });
+        await LikesTableTestHelper.addLikes({ id: 'like-123' });
+
+        const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+        // Action
+        const verify = await commentRepositoryPostgres.verifyLikeInComment(commentParam);
+
+        // Assert
+        const likes = await LikesTableTestHelper.findCommentsByCommentidAndUserId(commentParam);
+        expect(verify).toEqual(true);
+        expect(likes).toHaveLength(1);
+      });
+    });
+
+    describe('addLikeInComment function', () => {
+      it('should persist new like and return added thread correctly', async () => {
+        const commentParam = {
+          commentId: 'comment-123', userId: 'user-123',
+        };
+        // Arrange
+        await UsersTableTestHelper.addUser({ id: 'user-123' });
+        await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+        await CommentsTableTestHelper.addComment({ id: 'comment-123' });
+
+        const fakeIdGenerator = () => '123'; // stub!
+        const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+
+        // Action
+        await commentRepositoryPostgres.addLikeInComment(commentParam);
+
+        // Assert
+        const likes = await LikesTableTestHelper.findCommentsByCommentidAndUserId(commentParam);
+        expect(likes).toHaveLength(1);
+        expect(likes[0]).toStrictEqual({
+          id: 'like-123',
+          comment_id: 'comment-123',
+          user_id: 'user-123',
+        });
+      });
+    });
+
+    describe('deleteLikeInComment function', () => {
+      it('should persist delete likes when commendId and userId is correctly', async () => {
+        const commentParam = {
+          commentId: 'comment-123', userId: 'user-123',
+        };
+        // Arrange
+        await UsersTableTestHelper.addUser({ id: 'user-123' });
+        await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+        await CommentsTableTestHelper.addComment({ id: 'comment-123' });
+        await LikesTableTestHelper.addLikes({ id: 'like-123' });
+
+        const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+        // Action
+        await commentRepositoryPostgres.deleteLikeInComment(commentParam);
+
+        // Assert
+        const likes = await LikesTableTestHelper.findCommentsByCommentidAndUserId(commentParam);
+        expect(likes).toHaveLength(0);
       });
     });
   });

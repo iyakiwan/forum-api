@@ -27,6 +27,7 @@ const GetThreadUseCase = require('../Applications/use_case/threads/GetThreadUseC
 // -- Comment
 const AddCommentUseCase = require('../Applications/use_case/comments/AddCommentUseCase');
 const DeleteCommentUseCase = require('../Applications/use_case/comments/DeleteCommentUseCase');
+const UpdateLikeCommentUseCase = require('../Applications/use_case/comments/UpdateLikeCommentUseCase');
 // -- Reply
 const AddReplyUseCase = require('../Applications/use_case/replies/AddReplyUseCase');
 const DeleteReplyUseCase = require('../Applications/use_case/replies/DeleteReplyUseCase');
@@ -76,6 +77,9 @@ const useCaseInstanceContainer = {
     threadRepository: serviceInstanceContainer.threadRepository,
   }),
   deleteCommentUseCase: new DeleteCommentUseCase({
+    commentRepository: serviceInstanceContainer.commentRepository,
+  }),
+  updateLikeCommentUseCase: new UpdateLikeCommentUseCase({
     commentRepository: serviceInstanceContainer.commentRepository,
   }),
   // Reply

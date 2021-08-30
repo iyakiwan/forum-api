@@ -4,6 +4,7 @@ const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const AuthenticationsTableTestHelper = require('../../../../tests/AuthenticationsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
+const LikesTableTestHelper = require('../../../../tests/LikesTableTestHelper');
 const injections = require('../../injections');
 const createServer = require('../createServer');
 
@@ -11,12 +12,14 @@ describe('/threads/{threadId} endpoint', () => {
   let tokenAuth;
   let threadId;
   let commentId;
+  let likeId;
 
   afterAll(async () => {
     await pool.end();
   });
 
   afterEach(async () => {
+    await LikesTableTestHelper.cleanTable();
     await CommentsTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
     await AuthenticationsTableTestHelper.cleanTable();
@@ -224,7 +227,6 @@ describe('/threads/{threadId} endpoint', () => {
       const server = await createServer(injections);
 
       // Action
-      // Action
       const response = await server.inject({
         method: 'DELETE',
         url: `/threads/${threadId}/comments/${commentId}`,
@@ -283,6 +285,78 @@ describe('/threads/{threadId} endpoint', () => {
       const response = await server.inject({
         method: 'DELETE',
         url: '/threads/xxx/comments/xxx',
+        headers: { Authorization: `Bearer ${tokenAuth}` },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('Comment tidak ditemukan');
+    });
+  });
+
+  describe('when PUT /threads/{threadId}/comments/{commentId}/likes', () => {
+    it('should response 200 and comments is likes', async () => {
+      const server = await createServer(injections);
+
+      // Action
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}/comments/${commentId}/likes`,
+        headers: { Authorization: `Bearer ${tokenAuth}` },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
+    });
+
+    it('should response 400 when comment already deleted', async () => {
+      const server = await createServer(injections);
+      await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}/comments/${commentId}`,
+        headers: { Authorization: `Bearer ${tokenAuth}` },
+      });
+
+      // Action
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}/comments/${commentId}/likes`,
+        headers: { Authorization: `Bearer ${tokenAuth}` },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(400);
+      expect(responseJson.message).toEqual('Comment telah dihapus');
+    });
+
+    it('should response 401 when request without Authorization', async () => {
+      const server = await createServer(injections);
+
+      // Action
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}/comments/${commentId}/likes`,
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(401);
+      expect(responseJson.error).toEqual('Unauthorized');
+      expect(responseJson.message).toEqual('Missing authentication');
+    });
+
+    it('should response 404 when threadId and commentId not found', async () => {
+      const server = await createServer(injections);
+
+      // Action
+      const response = await server.inject({
+        method: 'PUT',
+        url: '/threads/xxx/comments/xxx/likes',
         headers: { Authorization: `Bearer ${tokenAuth}` },
       });
 

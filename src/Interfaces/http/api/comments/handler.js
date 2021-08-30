@@ -1,10 +1,12 @@
 class CommentsHandler {
-  constructor({ addCommentUseCase, deleteCommentUseCase }) {
+  constructor({ addCommentUseCase, deleteCommentUseCase, updateLikeCommentUseCase }) {
     this._addCommentUseCase = addCommentUseCase;
     this._deleteCommentUseCase = deleteCommentUseCase;
+    this._updateLikeCommentUseCase = updateLikeCommentUseCase;
 
     this.postCommentHandler = this.postCommentHandler.bind(this);
     this.deleteCommentHandler = this.deleteCommentHandler.bind(this);
+    this.putLikeCommentHandler = this.putLikeCommentHandler.bind(this);
   }
 
   async postCommentHandler(request, h) {
@@ -38,6 +40,24 @@ class CommentsHandler {
     };
 
     await this._deleteCommentUseCase.execute(deleteComment);
+
+    const response = h.response({
+      status: 'success',
+    });
+
+    response.code(200);
+    return response;
+  }
+
+  async putLikeCommentHandler(request, h) {
+    const { id: userId } = request.auth.credentials;
+    const { threadId, commentId } = request.params;
+
+    const updateLikeComment = {
+      commentId, threadId, userId,
+    };
+
+    await this._updateLikeCommentUseCase.execute(updateLikeComment);
 
     const response = h.response({
       status: 'success',

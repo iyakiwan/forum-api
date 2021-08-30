@@ -22,11 +22,8 @@ class GetThreadUseCase {
     }
 
     await Promise.all(result);
-    const detailThread = new DetailThread({
-      ...thread,
-      comments: result,
-    });
-    return detailThread;
+
+    return new DetailThread({ ...thread, comments: result });
   }
 }
 

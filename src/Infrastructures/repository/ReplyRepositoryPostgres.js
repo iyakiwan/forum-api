@@ -65,14 +65,13 @@ class ReplyRepositoryPostgres extends ReplyRepository {
       FROM replies 
       INNER JOIN users ON replies.owner = users.id 
       WHERE replies.comment_id = $1
-      ORDER BY replies.date ASC`,
+      ORDER BY replies.date`,
       values: [commentId],
     };
 
     const result = await this._pool.query(query);
-    const replies = result.rows.map((reply) => new DetailReply(reply));
 
-    return replies;
+    return result.rows.map((reply) => new DetailReply(reply));
   }
 }
 

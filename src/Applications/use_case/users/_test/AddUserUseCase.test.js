@@ -26,12 +26,9 @@ describe('AddUserUseCase', () => {
     const mockEncryptionHelper = new EncryptionHelper();
 
     /** mocking needed function */
-    mockUserRepository.verifyAvailableUsername = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-    mockEncryptionHelper.encryptPassword = jest.fn()
-      .mockImplementation(() => Promise.resolve('encrypted_password'));
-    mockUserRepository.addUser = jest.fn()
-      .mockImplementation(() => Promise.resolve(expectedAddedUser));
+    mockUserRepository.verifyAvailableUsername = jest.fn(() => Promise.resolve());
+    mockEncryptionHelper.encryptPassword = jest.fn(() => Promise.resolve('encrypted_password'));
+    mockUserRepository.addUser = jest.fn(() => Promise.resolve(expectedAddedUser));
 
     /** creating use case instance */
     const getUserUseCase = new AddUserUseCase({

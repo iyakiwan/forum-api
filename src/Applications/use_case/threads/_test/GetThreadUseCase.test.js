@@ -44,12 +44,9 @@ describe('GetThreadUseCase', () => {
     const mockReplyRepository = new ReplyRepository();
 
     /** mocking needed function */
-    mockReplyRepository.getReplyByCommentId = jest.fn()
-      .mockImplementation(() => Promise.resolve(expectedReply));
-    mockCommentRepository.getCommentsByThreadId = jest.fn()
-      .mockImplementation(() => Promise.resolve(expectedComment));
-    mockThreadRepository.getThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(expectedThread));
+    mockReplyRepository.getReplyByCommentId = jest.fn(() => Promise.resolve(expectedReply));
+    mockCommentRepository.getCommentsByThreadId = jest.fn(() => Promise.resolve(expectedComment));
+    mockThreadRepository.getThreadById = jest.fn(() => Promise.resolve(expectedThread));
 
     /** creating use case instance */
     const getThreadUseCase = new GetThreadUseCase({

@@ -29,10 +29,8 @@ describe('AddReplyUseCase', () => {
     const mockReplyRepository = new ReplyRepository();
 
     /** mocking needed function */
-    mockCommentRepository.verifyComment = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-    mockReplyRepository.addReply = jest.fn()
-      .mockImplementation(() => Promise.resolve(expectedAddedReply));
+    mockCommentRepository.verifyComment = jest.fn(() => Promise.resolve());
+    mockReplyRepository.addReply = jest.fn(() => Promise.resolve(expectedAddedReply));
 
     /** creating use case instance */
     const getReplyUseCase = new AddReplyUseCase({

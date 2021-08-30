@@ -1,5 +1,7 @@
 class DetailReply {
   constructor(payload) {
+    DetailReply.DELETED_CONTENT_REPLY = '**balasan telah dihapus**';
+
     this._verifyPayload(payload);
 
     const {
@@ -12,18 +14,32 @@ class DetailReply {
     this.username = username;
   }
 
-  static get DELETED_CONTENT_REPLY() { return '**balasan telah dihapus**'; }
+  // static get DELETED_CONTENT_REPLY() { return '**balasan telah dihapus**'; }
 
-  _verifyPayload({
-    id, content, date, username, isDelete,
-  }) {
-    if (!id || !content || !date || !username || isDelete === undefined) {
+  _verifyPayload(payload) {
+    if (this._isPayloadNotContainNeededProperty(payload)) {
       throw new Error('DETAIL_REPLY.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
-    if (typeof id !== 'string' || typeof content !== 'string' || typeof date !== 'string' || typeof username !== 'string' || typeof isDelete !== 'boolean') {
+    if (this._isPayloadNotMeetDataTypeSpecification(payload)) {
       throw new Error('DETAIL_REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
+  }
+
+  _isPayloadNotContainNeededProperty({
+    id, content, date, username, isDelete,
+  }) {
+    return !id || !content || !date || !username || isDelete === undefined;
+  }
+
+  _isPayloadNotMeetDataTypeSpecification({
+    id, content, date, username, isDelete,
+  }) {
+    return typeof id !== 'string'
+      || typeof content !== 'string'
+      || typeof date !== 'string'
+      || typeof username !== 'string'
+      || typeof isDelete !== 'boolean';
   }
 }
 

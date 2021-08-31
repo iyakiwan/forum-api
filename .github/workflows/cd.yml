@@ -18,7 +18,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
         script: |
-          cd ~/Back-End_Expert_Dicoding
+          cd ~/forum-api
           git pull origin master
           npm install
           npm run migrate up

@@ -63,7 +63,7 @@ const createServer = async (injections) => {
     method: 'GET',
     path: '/',
     handler: () => ({
-      value: 'Welcome to forum api!',
+      value: 'Welcome to forum api! Copyright: Mufti',
     }),
   });
 
